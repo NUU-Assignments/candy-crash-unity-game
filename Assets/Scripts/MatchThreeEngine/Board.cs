@@ -7,6 +7,9 @@ using DG.Tweening;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
+using UnityEngine.UI;
+using TMPro;
+
 
 namespace MatchThreeEngine
 {
@@ -34,6 +37,9 @@ namespace MatchThreeEngine
 
 		public event Action<TileTypeAsset, int> OnMatch;
 
+		[SerializeField] private TMP_Text scoreText; // Reference to the UI Text component
+    	private int score; // Variable to keep track of the score
+
 		private TileData[,] Matrix
 		{
 			get
@@ -53,6 +59,10 @@ namespace MatchThreeEngine
 
 		private void Start()
 		{
+
+			score = 0;
+    		UpdateScoreText();
+
 			for (var y = 0; y < rows.Length; y++)
 			{
 				for (var x = 0; x < rows.Max(row => row.tiles.Length); x++)
@@ -70,8 +80,19 @@ namespace MatchThreeEngine
 
 			if (ensureNoStartingMatches) StartCoroutine(EnsureNoStartingMatches());
 
-			OnMatch += (type, count) => Debug.Log($"Matched {count}x {type.name}.");
+			OnMatch += (type, count) =>
+    {
+        Debug.Log($"Matched {count}x {type.name}.");
+        score += count * 10; // Increase score; 10 points per tile matched
+        UpdateScoreText(); // Update the score display
+    };
 		}
+
+		private void UpdateScoreText()
+{
+    scoreText.text = "Score: " + score;
+}
+
 
 		private void Update()
 		{
